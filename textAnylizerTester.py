@@ -1,24 +1,53 @@
-import re
+import nltk
+import string
+from collections import Counter
 
-def analyze_text(text):
-    # Split text into individual words
-    words = re.findall(r'\b\w+\b', text)
+# Function to count number of occurrences of a word in a text
+def count_occurrences(text, word):
+    # Converting word to lowercase for case insensitivity
+    word = word.lower()
+    return Counter(text).get(word)
+    
+def sort_words(words):
+    # Sorting words alphabetically by their counts in descending order
+    sorted_words = sorted(list(Counter(w.split())).items(), key=lambda x: -x[1])
+    return sorted_words
 
-    # Filter out words with less than or equal to 3 letters
-    filtered_words = [word for word in words if len(word) > 3]
+def find_greater_than_three(text, word):
+    # Checking if word is greater than three letters long in alphabetical order
+    count = count_occurrences(text, word)
+    if count > 3:
+        return True
+    else:
+        return False
 
-    # Sort the filtered words alphabetically
-    sorted_words = sorted(filtered_words, key=lambda x: x.lower())
+def main():
+    text = input("Enter a paragraph of text to find and count the longer words: ").strip()
+    # Removing punctuation and converting to lowercase
+    text = ' '.join(text.split())
+    text = text.lower()
+    
+    words_list = nltk.word_tokenize(text)
+    words = []
+    for word in words_list:
+        if word[0] != 'a':
+            continue
+        try:
+            count = count_occurrences(words, word)
+            # Checking if the word is longer than three letters long in alphabetical order
+            if count > 3:
+                # Sorting the words alphabetically by their counts in descending order
+                sorted_words = sort_words(sorted(list(Counter(w.split())).items(), key=lambda x: -x[1]))
+                # Printing all longer and shorter words
+                print("Longer Word (count > 3): ", word)
+                print("Shortest Word (count < 3): ", sorted_words[0][1])
+            else:
+                # If the word is not greater than three letters long in alphabetical order, no need to sort it.
+                pass
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    main()
 
-    # Count occurrences of "and"
-    and_count = text.count('and')
-
-    print("Words with more than 3 letters:")
-    for word in sorted_words:
-        print(word)
-
-    print(f"'and' appears {and_count} times.")
-
-if __name__ == "__main__":
-    paragraph = input("Enter a paragraph: ")
-    analyze_text(paragraph)
+if __name__ == '__main__':
+    main()
